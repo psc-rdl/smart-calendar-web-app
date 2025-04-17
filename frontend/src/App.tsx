@@ -5,6 +5,7 @@ function App() {
   const [task, setTask] = useState('');
   const [duration, setDuration] = useState('');
   const [response, setResponse] = useState('');
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,21 +22,21 @@ function App() {
 
   return (
     <div>
-      <h1>Task Scheduler</h1>
+      <h1>Diddy Website</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder="Task name"
+          placeholder="Message to P. Diddy"
           value={task}
           onChange={(e) => setTask(e.target.value)}
         />
         <input
           type="text"
-          placeholder="Duration (in minutes)"
+          placeholder="Diddy Party Duration (in hours)"
           value={duration}
           onChange={(e) => setDuration(e.target.value)}
         />
-        <button type="submit">Schedule Task</button>
+        <button type="submit">Schedule Diddy Session</button>
       </form>
       <p>{response}</p>
     </div>

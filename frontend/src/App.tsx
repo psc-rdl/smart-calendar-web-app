@@ -1,72 +1,32 @@
 import { useState } from 'react';
 import './App.css';
 
+interface Task {
+  title: string;
+  duration: number; // in minutes
+}
+
 interface Event {
   title: string;
   start: string; // e.g. "10:00"
   end: string;   // e.g. "11:30"
-  dayOffset: number; // 0 = today, 1 = tomorrow, etc.
+  dayOffset: number;
 }
 
 function App() {
   const [task, setTask] = useState('');
-  const [duration, setDuration] = useState(''); // in minutes
+  const [durationHours, setDurationHours] = useState(0);
+  const [durationMinutes, setDurationMinutes] = useState(0);
+  const [pendingTasks, setPendingTasks] = useState<Task[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
 
-  const handleAddEvent = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!task || !duration) return;
+  const hours = Array.from({ length: 24 }, (_, i) => i); // 0 - 23
+  const dayOffsets = [0, 1, 2];
 
-    const durationMinutes = parseInt(duration);
-    const dayOffset = 1; // default to tomorrow
-
-    const optimalStartHour = findAvailableSlot(dayOffset, durationMinutes);
-    if (optimalStartHour === null) {
-      alert("No available slot!");
-      return;
-    }
-
-    const startHour = Math.floor(optimalStartHour);
-    const startMinutes = Math.round((optimalStartHour - startHour) * 60);
-    const endMinutesTotal = startHour * 60 + startMinutes + durationMinutes;
-    const endHour = Math.floor(endMinutesTotal / 60);
-    const endMinutes = endMinutesTotal % 60;
-
-    const formatTime = (h: number, m: number) =>
-      `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-
-    const startTime = formatTime(startHour, startMinutes);
-    const endTime = formatTime(endHour, endMinutes);
-
-    setEvents([...events, { title: task, start: startTime, end: endTime, dayOffset }]);
-    setTask('');
-    setDuration('');
-  };
-
-  // Fake scheduler: just finds the next available hour starting at 8AM
-  const findAvailableSlot = (dayOffset: number, duration: number): number | null => {
-    const taken: [number, number][] = events
-      .filter(ev => ev.dayOffset === dayOffset)
-      .map(ev => {
-        const startParts = ev.start.split(':').map(Number);
-        const endParts = ev.end.split(':').map(Number);
-        const start = startParts[0] + startParts[1] / 60;
-        const end = endParts[0] + endParts[1] / 60;
-        return [start, end];
-      });
-
-    for (let hour = 8; hour <= 20 - duration / 60; hour += 0.25) {
-      const end = hour + duration / 60;
-      if (taken.every(([s, e]) => end <= s || hour >= e)) {
-        return hour;
-      }
-    }
-    return null;
-  };
-
-  const hours = Array.from({ length: 24 }, (_, i) => i);
   const formatHour = (hour: number) =>
-    hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`;
+    hour === 0 ? '12 AM' :
+    hour < 12 ? `${hour} AM` :
+    hour === 12 ? '12 PM' : `${hour - 12} PM`;
 
   const getDateLabel = (offset: number) => {
     const date = new Date();
@@ -74,27 +34,88 @@ function App() {
     return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   };
 
-  const dayOffsets = [0, 1, 2];
+  const handleAddTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    const duration = durationHours * 60 + durationMinutes;
+    if (!task || duration <= 0) return;
+
+    setPendingTasks([...pendingTasks, { title: task, duration }]);
+    setTask('');
+    setDurationHours(0);
+    setDurationMinutes(0);
+  };
+
+  const handleScheduleTasks = () => {
+    const newEvents: Event[] = [];
+    let currentTime = 0; // start from 12:00 AM
+    let dayOffset = 0;
+
+    for (const task of pendingTasks) {
+      if (currentTime + task.duration > 24 * 60) { // past 12:00 AM next day
+        currentTime = 0;
+        dayOffset++;
+      }
+
+      const startHour = Math.floor(currentTime / 60);
+      const startMin = currentTime % 60;
+      const endMinTotal = currentTime + task.duration;
+      const endHour = Math.floor(endMinTotal / 60);
+      const endMin = endMinTotal % 60;
+
+      const start = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+      const end = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
+
+      newEvents.push({ title: task.title, start, end, dayOffset });
+      currentTime = endMinTotal;
+    }
+
+    setEvents(newEvents);
+  };
 
   return (
     <div className="calendar-wrapper">
       <div className="form-panel">
-        <h1>Schedule an Event</h1>
-        <form onSubmit={handleAddEvent}>
+        <h1>Schedule Tasks</h1>
+        <form onSubmit={handleAddTask}>
           <input
             type="text"
             placeholder="Task name"
             value={task}
             onChange={(e) => setTask(e.target.value)}
           />
-          <input
-            type="number"
-            placeholder="Duration (min)"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-          />
-          <button type="submit">Add Event</button>
+          <label>Duration</label>
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+            <input
+              type="number"
+              min="0"
+              placeholder="Hours"
+              value={durationHours}
+              onChange={(e) => setDurationHours(Number(e.target.value))}
+              style={{ width: '60px' }}
+            />
+            <input
+              type="number"
+              min="0"
+              max="59"
+              placeholder="Minutes"
+              value={durationMinutes}
+              onChange={(e) => setDurationMinutes(Number(e.target.value))}
+              style={{ width: '60px' }}
+            />
+          </div>
+          <button type="submit">Add Task</button>
         </form>
+
+        <h2>Pending Tasks</h2>
+        <ul>
+          {pendingTasks.map((t, i) => (
+            <li key={i}>
+              {t.title} – {Math.floor(t.duration / 60)}h {t.duration % 60}m
+            </li>
+          ))}
+        </ul>
+
+        <button onClick={handleScheduleTasks}>Optimize Schedule</button>
       </div>
 
       <div className="calendar-container">
@@ -111,10 +132,13 @@ function App() {
               {events
                 .filter((ev) => ev.dayOffset === dayIdx)
                 .map((ev, i) => {
-                  const start = parseFloat(ev.start.replace(':', '.'));
-                  const end = parseFloat(ev.end.replace(':', '.'));
-                  const top = (start - 8) * 60;
-                  const height = (end - start) * 60;
+                  const [startH, startM] = ev.start.split(':').map(Number);
+                  const [endH, endM] = ev.end.split(':').map(Number);
+                  const startMinutes = startH * 60 + startM;
+                  const endMinutes = endH * 60 + endM;
+                  const top = startMinutes;
+                  const height = endMinutes - startMinutes;
+
                   return (
                     <div
                       key={i}

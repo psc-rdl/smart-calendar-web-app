@@ -1,42 +1,106 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+body {
+  font-family: sans-serif;
+  margin: 0;
+  background-color: #f0f2f5;
+}
+
+.calendar-wrapper {
+  display: flex;
+  padding: 20px;
+}
+
+.form-panel {
+  width: 300px;
+  margin-right: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.form-panel h1 {
+  margin-top: 0;
+}
+
+.form-panel input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+.form-panel button {
+  padding: 10px;
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.form-panel button:hover {
+  background-color: #0056b3;
+}
+
+.calendar-container {
+  display: flex;
+  overflow-x: auto;
+}
+
+.time-column {
+  width: 80px;
+  border-right: 1px solid #ddd;
+}
+
+.time-slot {
+  height: 60px;
+  border-bottom: 1px solid #eee;
+  text-align: right;
+  padding-right: 8px;
+  box-sizing: border-box;
+  font-size: 12px;
+  color: #555;
+}
+
+.day-column {
+  flex: 1;
+  position: relative;
+  border-right: 1px solid #ddd;
+  min-width: 150px;
+}
+
+.day-label {
   text-align: center;
+  padding: 8px 0;
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #ccc;
+  font-weight: bold;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.day-grid {
+  position: relative;
+  height: 1440px; /* 24 hours * 60 minutes */
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.event-block {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  background-color: #d1eaff;
+  border-left: 4px solid #007bff;
+  padding: 4px 6px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  font-size: 12px;
+  overflow: hidden;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.event-title {
+  font-weight: bold;
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+.event-time {
+  font-size: 10px;
+  color: #333;
 }

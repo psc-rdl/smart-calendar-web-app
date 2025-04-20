@@ -88,21 +88,22 @@ function App() {
             <input
               type="number"
               min="0"
-              placeholder="Hours"
-              value={durationHours}
-              onChange={(e) => setDurationHours(Number(e.target.value))}
+              placeholder={durationHours === 0 ? "Hrs" : ""}
+              value={durationHours === 0 ? "" : durationHours} // Display empty if 0
+              onChange={(e) => setDurationHours(e.target.value ? Number(e.target.value) : 0)} // Handle empty input correctly
               style={{ width: '60px' }}
             />
             <input
               type="number"
               min="0"
               max="59"
-              placeholder="Minutes"
-              value={durationMinutes}
-              onChange={(e) => setDurationMinutes(Number(e.target.value))}
+              placeholder={durationMinutes === 0 ? "Min" : ""}
+              value={durationMinutes === 0 ? "" : durationMinutes} // Display empty if 0
+              onChange={(e) => setDurationMinutes(e.target.value ? Number(e.target.value) : 0)} // Handle empty input correctly
               style={{ width: '60px' }}
             />
           </div>
+
           <button type="submit">Add Task</button>
         </form>
 

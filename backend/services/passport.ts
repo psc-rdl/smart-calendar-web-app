@@ -1,22 +1,23 @@
-import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import passport from 'passport';
+import passportGoogle from 'passport-google-oauth20';
+import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '../utils/secrets';
+const GoogleStrategy = passportGoogle.Strategy;
 
-passport.serializeUser((user: any, done) => {
+passport.use(new GoogleStrategy(
+  {
+    clientID: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    callbackURL: "/auth/google/redirect",
+  },
+  (accessToken, refreshToken, profile, done) => {
+    return done(null, profile);
+  }
+))
+
+passport.serializeUser((user, done) => {
   done(null, user);
 });
-passport.deserializeUser((user: any, done) => {
+
+passport.deserializeUser((user: Express.User, done) => {
   done(null, user);
 });
-
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID!,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-  callbackURL: "/api/auth/google/callback"
-}, (accessToken, refreshToken, profile, done) => {
-  const user = {
-    profile,
-    accessToken,
-    refreshToken
-  };
-  done(null, user); // You can also save to Firebase here
-}));

@@ -1,18 +1,19 @@
-import express from 'express';
-import passport from 'passport';
-
+import passport from "passport";
+import express from "express";
 const router = express.Router();
 
-router.get('/google', passport.authenticate('google', {
-  scope: ['profile', 'email', 'https://www.googleapis.com/auth/calendar']
-}));
-
-router.get('/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/' }),
-  (req, res) => {
-    // Here, you can redirect to the frontend with a token or session
-    res.redirect('http://localhost:5173/dashboard'); // or send user info as query
-  }
+router.get(
+  "/google",
+  passport.authenticate("google", {
+    scope: ["email", "profile"],
+  })
 );
 
+router.get("/google/redirect", passport.authenticate("google", { failureRedirect: 'http://localhost:5173', session: true}), (req, res) => {
+  res.redirect('http://localhost:5173/scheduler');
+});
+
 export default router;
+
+
+

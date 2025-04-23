@@ -1,0 +1,47 @@
+/* Login.css */
+
+/* Centering content */
+.login-body {
+    color: #E8CACC;
+    background-color: #461220;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.login-container {
+    text-align: center;
+    margin-top: 100px;
+  }
+  
+  /* Styling the title */
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    margin-top: -100px;
+  }
+  
+  /* Styling the Google Sign-In button */
+  .login-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #B23A48;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Hover effect for the button */
+  .login-button:hover {
+    background-color: #8A2A3D;
+  }
+  
+  /* Optional: Adding a subtle shadow to the button */
+  .login-button:active {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+
+
+  

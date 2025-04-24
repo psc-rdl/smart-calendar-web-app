@@ -1,6 +1,8 @@
 import passport from 'passport';
 import passportGoogle from 'passport-google-oauth20';
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '../utils/secrets';
+
+
 const GoogleStrategy = passportGoogle.Strategy;
 
 passport.use(new GoogleStrategy(
@@ -10,14 +12,19 @@ passport.use(new GoogleStrategy(
     callbackURL: "/auth/google/redirect",
   },
   (accessToken, refreshToken, profile, done) => {
-    return done(null, profile);
+    const user = {
+      profile,
+      accessToken,
+      refreshToken
+    };
+    return done(null, user);
   }
 ))
 
-passport.serializeUser((user, done) => {
+passport.serializeUser((user: any, done) => {
   done(null, user);
 });
 
-passport.deserializeUser((user: Express.User, done) => {
+passport.deserializeUser((user: any, done) => {
   done(null, user);
 });

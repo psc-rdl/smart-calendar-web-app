@@ -1,60 +1,33 @@
-import express from 'express';
-import cors from 'cors';
 import dotenv from 'dotenv';
-import { exec } from 'child_process';
-import passport from 'passport';
-import session from 'express-session';
-import path from 'path';
+dotenv.config({ path: '../.env'});
+import express, {Request, Response} from 'express';
+import "./services/passport";
+import passport from "passport";
+import session from "express-session";
+import cors from "cors";
 import authRoutes from './routes/auth';
-import './services/passport';
-import { Request, Response, NextFunction } from 'express';
-
-dotenv.config();
+import calendarRoutes from './routes/calendar';
+import { CURRENT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from './utils/secrets';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
-
-app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true,
-}));
-
-app.use(express.json());
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-secret',
+  secret: CURRENT_SECRET,
   resave: false,
-  saveUninitialized: true,
-}));
+  saveUninitialized: false,
+  cookie: { secure: false },
+}))
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/api/auth', authRoutes);
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
 
-app.get('/api/hello', (_req, res) => {
-  res.json({ message: 'Hello from backend!' });
-});
+app.use('/auth', authRoutes);
+app.use('/calendar', calendarRoutes);
 
-app.post('/api/schedule', (req, res) => {
-  const input = req.body;
-  const scriptPath = path.join(__dirname, 'scheduler.py');
+app.listen(3001, () => console.log('listening on: 3001'));
 
-  exec(`python3 ${scriptPath}`, (error, stdout, stderr) => {
-    if (error) {
-      console.error('Error executing Python script:', error);
-      return res.status(500).json({ error: 'Script failed' });
-    }
-
-    res.json({ message: 'Scheduled!', output: stdout });
-  });
-});
-
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});

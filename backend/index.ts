@@ -6,7 +6,7 @@ import passport from "passport";
 import session from "express-session";
 import cors from "cors";
 import authRoutes from './routes/auth';
-import { CURRENT_SECRET } from './utils/secrets';
+import { CURRENT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from './utils/secrets';
 
 const app = express();
 
@@ -14,6 +14,7 @@ app.use(session({
   secret: CURRENT_SECRET,
   resave: false,
   saveUninitialized: false,
+  cookie: { secure: false },
 }))
 
 app.use(passport.initialize());

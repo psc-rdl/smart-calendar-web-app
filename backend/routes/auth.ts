@@ -6,7 +6,7 @@ const router = express.Router();
 router.get(
   "/google",
   passport.authenticate("google", {
-    scope: ["email", "profile"],
+    scope: ["email", "profile", "https://www.googleapis.com/auth/calendar"],
   })
 );
 

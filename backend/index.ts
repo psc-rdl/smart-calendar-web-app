@@ -6,6 +6,7 @@ import passport from "passport";
 import session from "express-session";
 import cors from "cors";
 import authRoutes from './routes/auth';
+import calendarRoutes from './routes/calendar';
 import { CURRENT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from './utils/secrets';
 
 const app = express();
@@ -26,6 +27,7 @@ app.use(cors({
 }));
 
 app.use('/auth', authRoutes);
+app.use('/calendar', calendarRoutes);
 
 app.listen(3001, () => console.log('listening on: 3001'));
 

@@ -1,12 +1,11 @@
-import { useNavigate } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
 import './Login.css';  // Importing the CSS file
 
 function Login() {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   const handleLogin = () => {
-    // Placeholder for Google Sign-In logic
-    navigate('/scheduler');
+    window.location.assign('http://localhost:3001/auth/google');
   };
 
   return (

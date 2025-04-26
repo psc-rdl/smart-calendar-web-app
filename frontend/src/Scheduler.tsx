@@ -5,7 +5,7 @@ interface Task {
   title: string;
   duration: number; // in minutes
   deadline: string; // e.g., "2025-04-25"
-  priority: 'High' | 'Medium' | 'Low';
+  priority: number; // 1 to 5
 }
 
 interface Event {
@@ -20,12 +20,12 @@ function Scheduler() {
   const [durationHours, setDurationHours] = useState(0);
   const [durationMinutes, setDurationMinutes] = useState(0);
   const [deadline, setDeadline] = useState('');
-  const [priority, setPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
+  const [priority, setPriority] = useState<number>(5);
   const [pendingTasks, setPendingTasks] = useState<Task[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
 
   const hours = Array.from({ length: 24 }, (_, i) => i); // 0 - 23
-  const dayOffsets = [0, 1, 2];
+  const dayOffsets = Array.from({ length: 7 }, (_, i) => i);
 
   const formatHour = (hour: number) =>
     hour === 0 ? '12 AM' :
@@ -48,7 +48,7 @@ function Scheduler() {
     setDurationHours(0);
     setDurationMinutes(0);
     setDeadline('');
-    setPriority('Medium');
+    setPriority(5);
   };
 
   const handleScheduleTasks = () => {
@@ -120,15 +120,15 @@ function Scheduler() {
           />
 
           <label>Priority</label>
-          <select
+          <p className="priority-description">1-high, 5-low</p>
+          <input
+            type="number"
+            min="1"
+            max="5"
             value={priority}
-            onChange={(e) => setPriority(e.target.value as 'High' | 'Medium' | 'Low')}
+            onChange={(e) => setPriority(Number(e.target.value))}
             style={{ marginBottom: '10px' }}
-          >
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-          </select>
+          />
 
           <button type="submit">Add Task</button>
         </form>

@@ -51,32 +51,27 @@ function Scheduler() {
     setPriority(5);
   };
 
-  const handleScheduleTasks = () => {
-    const newEvents: Event[] = [];
-    let currentTime = 0; // start from 12:00 AM
-    let dayOffset = 0;
-
-    for (const task of pendingTasks) {
-      if (currentTime + task.duration > 24 * 60) { // past 12:00 AM next day
-        currentTime = 0;
-        dayOffset++;
+  const handleScheduleTasks = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/optimize-schedule', { // Replace with your API URL
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tasks: pendingTasks }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to optimize schedule');
       }
-
-      const startHour = Math.floor(currentTime / 60);
-      const startMin = currentTime % 60;
-      const endMinTotal = currentTime + task.duration;
-      const endHour = Math.floor(endMinTotal / 60);
-      const endMin = endMinTotal % 60;
-
-      const start = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
-      const end = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
-
-      newEvents.push({ title: task.title, start, end, dayOffset });
-      currentTime = endMinTotal;
+  
+      const data = await response.json();
+      setEvents(data.events); // Assuming backend returns { events: Event[] }
+    } catch (error) {
+      console.error('Error optimizing schedule:', error);
     }
-
-    setEvents(newEvents);
   };
+  
 
   return (
     <div className="calendar-wrapper">
